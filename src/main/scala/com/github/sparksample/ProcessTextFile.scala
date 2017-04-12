@@ -6,7 +6,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 /*
  Simple test case for processing a plain text file.
  */
-object ConnectSparkToProcessTextFile extends SparkConfig {
+object ProcessTextFile extends SparkConfig {
   def main(args: Array[String]): Unit = {
     val sc = new SparkContext(sparkConf(this.getClass.getName))
     val len = sc.textFile("/tmp/data/data.txt").map(s => s.length).reduce(_ + _)
