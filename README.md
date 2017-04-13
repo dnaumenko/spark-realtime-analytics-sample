@@ -12,8 +12,8 @@ Spark version used - 2.1.0
 
 # Dependencies
 
-## Spark 
-
+## Spark
+ 
 There is a Docker compose script for simple cluster with master and one worker.
 It's based on [gettyimages/docker-spark](https://github.com/gettyimages/docker-spark).
 
@@ -24,7 +24,25 @@ In addition, it binds spark-default.conf from this repo `conf` directory to a co
 You can override the defaults there.
 
 If you need to pass the local files to worker nodes, there is a /tmp/data folder already available.
-Use Docker to make a binding to your local folder
+Use Docker to make a binding to your local folder.
+
+(Optionally) Download and install the latest version of Spark [here](http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-hadoop2.7.tgz) 
+to get command line tools at hand (e.g. `spark-submit` script).
+
+## Cassandra
+
+You should specify the Cassandra host for jobs.
+
+If you use spark-submit script locally, 
+update your conf/spark-defaults.conf in Spark's home with following line:
+```
+# Cassandra configs
+spark.cassandra.connection.host=192.168.0.175 # put your host here
+```
+
+If you use spark-submit script from Docker via exec, put the changes above to `./conf/{master,worker}/spark-defaults.conf`.
+
+The third option is to put host programmatically via `conf.set("spark.cassandra.connection.host", "192.168.0.175")` in examples code.
 
 # How to start
 
@@ -34,7 +52,13 @@ Example:
 ```
 > spark-submit --class com.github.sparksample.ConnectSparkToCassandra --master localhost:7077 ./target/scala-2.11/spark-analytics-sample-assembly-1.0.jar
 ```
-2. Second, you can submit jobs programmatically, via SparkLauncher.
+2. You can submit jobs programmatically, via SparkLauncher.
+
+# Local testing/debugging
+
+Local cluster is a good option when you want to debug/experiment with Spark during development.
+In this case, you don't need a running cluster. To enable it, set the standaloneMode = true during Spark config init:
+> val conf = sparkConf(this.getClass.getName, **standaloneMode = true**)
 
 
 
