@@ -52,7 +52,11 @@ Example:
 ```
 > spark-submit --class com.github.sparksample.ConnectSparkToCassandra --master localhost:7077 ./target/scala-2.11/spark-analytics-sample-assembly-1.0.jar
 ```
-2. You can submit jobs programmatically, via SparkLauncher.
+2. You can submit jobs programmatically, via SparkLauncher. It's a builder on top of spark-submit process.
+But it's quite difficult to use. You should have a separate application and jar with spark jobs loaded as resource.
+See [this doc](http://henningpetersen.com/post/22/running-apache-spark-jobs-from-applications) for some details.
+
+Note: in addition, it's possible to use REST API for managing Spark jobs/jars via [spark-jobserver](https://github.com/spark-jobserver/spark-jobserver). 
 
 # Local testing/debugging
 
