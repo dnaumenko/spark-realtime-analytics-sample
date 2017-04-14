@@ -3,6 +3,8 @@ package com.github.sparksample
 import com.github.sparksample.ProcessTextFile.sparkConf
 import org.apache.spark.SparkContext
 import com.datastax.spark.connector._
+import com.datastax.spark.connector.cql.CassandraConnector
+import org.apache.spark.sql.hive.thriftserver.HiveThriftServer2
 import org.apache.spark.sql.{SQLContext, SparkSession}
 
 /*
@@ -30,7 +32,6 @@ object QueryCassandraViaDataSets {
    */
   def main(args: Array[String]): Unit = {
     val conf = sparkConf(this.getClass.getName, standaloneMode = true)
-    val sc = new SparkContext(conf)
     val ssc = SparkSession.builder().config(conf).getOrCreate()
 
     val df = ssc.read
@@ -38,5 +39,30 @@ object QueryCassandraViaDataSets {
       .load()
 
     df.show()
+  }
+}
+
+object QueryCassandraAsJDBC {
+  def main(args: Array[String]): Unit = {
+    val conf = sparkConf(this.getClass.getName, standaloneMode = true)
+    conf.set("hive.server2.thrift.port","10002")
+    val ssc = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate()
+    val sql = ssc.sqlContext
+
+    val df = sql.read
+      .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "fingerprint", "table" -> "identities"))
+      .load()
+    df.createOrReplaceTempView("fingerprint_identities_tmp") // doesn't work, Thrift can't see it:(
+
+    // works in next way, but creates a copy of data
+//    sql.sql("create table fingerprint_identities as select * from fingerprint_identities_tmp")
+
+    HiveThriftServer2.startWithContext(sql)
+
+    CassandraConnector(ssc.sparkContext).withSessionDo( _ =>
+      while (true) {
+        Thread.`yield`()
+      }
+    )
   }
 }
