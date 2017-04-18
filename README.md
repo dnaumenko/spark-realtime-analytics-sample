@@ -65,5 +65,16 @@ In this case, you don't need a running cluster. To enable it, set the standalone
 > val conf = sparkConf(this.getClass.getName, **standaloneMode = true**)
 
 
+# Resources
 
+## Spark
+* http://spark.apache.org/docs/latest/sql-programming-guide.html#running-the-thrift-jdbcodbc-server - official doc
 
+## Cassandra-connector
+
+* https://github.com/datastax/spark-cassandra-connector/blob/master/doc/1_connecting.md
+
+## Thrift JDBC/ODBC Server
+
+* https://forums.databricks.com/questions/1464/how-to-configure-thrift-server-to-use-a-custom-spa.html - most useful discussion about the subject
+* https://github.com/inadco/cassandra-spark-jdbc-bridge - old versions used, but illustrates the idea 
