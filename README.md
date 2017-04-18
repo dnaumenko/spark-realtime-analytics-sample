@@ -46,7 +46,7 @@ The third option is to put host programmatically via `conf.set("spark.cassandra.
 
 # How to start
 
-There are examples to launch as stand-alone apps and you have 2 options how to submit jobs to Spark cluster:
+There are examples to launch as stand-alone apps and you have many options how to submit jobs to Spark cluster:
 1. you can use /bin/spark-submit script. See [docs](http://spark.apache.org/docs/latest/submitting-applications.html) for details. 
 Example:
 ```
@@ -56,7 +56,10 @@ Example:
 But it's quite difficult to use. You should have a separate application and jar with spark jobs loaded as resource.
 See [this doc](http://henningpetersen.com/post/22/running-apache-spark-jobs-from-applications) for some details.
 
-Note: in addition, it's possible to use REST API for managing Spark jobs/jars via [spark-jobserver](https://github.com/spark-jobserver/spark-jobserver). 
+3. REST API for managing Spark jobs/jars via [spark-jobserver](https://github.com/spark-jobserver/spark-jobserver)
+ or something similar
+
+4. Use a long-running app with REST API (as a driver program) that uses Spark Context like DB.
 
 # Local testing/debugging
 
