@@ -67,7 +67,6 @@ Local cluster is a good option when you want to debug/experiment with Spark duri
 In this case, you don't need a running cluster. To enable it, set the standaloneMode = true during Spark config init:
 > val conf = sparkConf(this.getClass.getName, **standaloneMode = true**)
 
-
 # Resources
 
 ## Spark
