@@ -11,6 +11,7 @@ import spray.json._
 
 import scala.concurrent.Future
 import com.datastax.spark.connector._
+import org.apache.spark.sql.SparkSession
 
 final case class Identity(id: Long)
 
@@ -20,24 +21,42 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
 object SimpleServer extends Directives with JsonSupport {
 
-  def routes(sc: SparkContext): Route =
-    path("api" / "identity" / "count") {
-      get {
-        val table = sc.cassandraTable("fingerprint", "identities")
-        val count = table.count()
+  def routes(ssc: SparkSession): Route = {
+    pathPrefix("api") {
+      path("events" / "count") {
+        get {
+          val df = ssc.read
+            .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test", "table" -> "events"))
+            .load()
+          val count = df.count()
 
-        complete(s"Identities count: $count")
+          complete(s"Identities count: $count")
+        }
+      } ~ path("events" / "retention") {
+        val events = ssc.read
+          .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test", "table" -> "events"))
+          .load()
+
+        val devices = ssc.read
+          .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test", "table" -> "devices"))
+          .load()
+
+        val join = events.join(devices, "device_id")
+
+        join.show()
+        complete("TODO")
       }
     }
+  }
 
-  def run(sc: SparkContext): Unit = {
+  def run(ssc: SparkSession): Unit = {
       implicit val system = ActorSystem()
       implicit val materializer = ActorMaterializer()
       import system.dispatcher
 
       val serverSource: Source[Http.IncomingConnection, Future[Http.ServerBinding]] =
         Http().bind(interface = "localhost", port = 9099)
-      val sink = Sink.foreach[Http.IncomingConnection](_.handleWith(routes(sc)))
+      val sink = Sink.foreach[Http.IncomingConnection](_.handleWith(routes(ssc)))
 
       serverSource.to(sink).run
   }

@@ -2,12 +2,13 @@ package com.github.sparksample
 
 import com.github.sparksample.config.SparkConfig
 import com.github.sparksample.http.SimpleServer
-import org.apache.spark.SparkContext
+import org.apache.spark.sql.SparkSession
 
 object LaunchHttpApp extends SparkConfig {
   def main(args: Array[String]): Unit = {
-    val sc = new SparkContext(sparkConf(this.getClass.getName, standaloneMode = true))
+    val conf = sparkConf(this.getClass.getName, standaloneMode = true)
+    val ssc = SparkSession.builder().config(conf).getOrCreate()
 
-    SimpleServer.run(sc)
+    SimpleServer.run(ssc)
   }
 }
