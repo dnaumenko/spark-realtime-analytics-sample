@@ -51,8 +51,6 @@ object SimpleServer extends Directives with JsonSupport {
           .withColumn("d15_retention", when(col("event_date") === date_add(col("install_date"), 15), 1).otherwise(0))
           .withColumn("d30_retention", when(col("event_date") === date_add(col("install_date"), 30), 1).otherwise(0))
 
-        join.persist()
-
         val j = join.select("*")
           .groupBy("platform_name", "language", "device_model", "ip_country", "app_version", "os_version", "install_date")
           .agg(
