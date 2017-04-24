@@ -16,17 +16,16 @@ master:
     - 7077
     - 6066
   ports:
-    - 4040:4040
     - 6066:6066
     - 7077:7077
-    - 7080:8080
+    - 8080:8080
   volumes:
     - ./conf/master:/conf
     - ./data:/tmp/data
 
 worker:
   image: gettyimages/spark
-  command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://master:7077
+  command: bin/spark-class org.apache.spark.deploy.worker.Worker -m 2048M spark://master:7077
   hostname: worker
   environment:
     SPARK_CONF_DIR: /conf
@@ -45,7 +44,7 @@ worker:
     - 7016
     - 8881
   ports:
-    - 7081:8081
+    - 8081:8081
   volumes:
     - ./conf/worker:/conf
     - ./data:/tmp/data

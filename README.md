@@ -18,7 +18,7 @@ There is a Docker compose script for simple cluster with master and one worker.
 It's based on [gettyimages/docker-spark](https://github.com/gettyimages/docker-spark).
 
 Simply run `docker-compose up` to get the running cluster on your machine.
-By default, it binds master's Spark UI to [localhost:7081](http://localhost:7081).
+By default, it binds master's Spark UI to [localhost:8081](http://localhost:8081). Worker node use 4G of memory by default.
 
 In addition, it binds spark-default.conf from this repo `conf` directory to a container.
 You can override the defaults there.
@@ -67,10 +67,19 @@ Local cluster is a good option when you want to debug/experiment with Spark duri
 In this case, you don't need a running cluster. To enable it, set the standaloneMode = true during Spark config init:
 > val conf = sparkConf(this.getClass.getName, **standaloneMode = true**)
 
+# Load Test with Gatling
+
+There is also a separate module (loadtool) not included in assembly jar that is used for load tests. You can run a simple scenario via `Engine` class 
+from IDE. The code and usage is trivial. Check [Gatling](http://gatling.io/docs/current/) for details. 
+
+## Issues found during testing
+ 
+* Concurrent SQL requests fail from time to time (should be fixed in 2.2.0) - https://issues.apache.org/jira/browse/SPARK-13747  
+
 # Resources
 
 ## Spark
-* http://spark.apache.org/docs/latest/sql-programming-guide.html#running-the-thrift-jdbcodbc-server - official doc
+* http://spark.apache.org/docs/latest/sql-programming-guide.html - official doc
 
 ## Cassandra-connector
 

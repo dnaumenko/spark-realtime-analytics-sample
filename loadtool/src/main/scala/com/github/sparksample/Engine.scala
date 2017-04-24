@@ -3,13 +3,14 @@ package com.github.sparksample
 import io.gatling.app.Gatling
 import io.gatling.core.config.GatlingPropertiesBuilder
 
-object Engine extends App {
+import IDEPathHelper._
 
+object Engine extends App {
 	val props = new GatlingPropertiesBuilder
-	props.dataDirectory(IDEPathHelper.dataDir.toString)
-	props.resultsDirectory(IDEPathHelper.resultsDir.toString)
-	props.bodiesDirectory(IDEPathHelper.bodiesDir.toString)
-	props.binariesDirectory(IDEPathHelper.binariesDir.toString)
+	props.dataDirectory(dataDir.toString)
+	props.resultsDirectory(resultsDir.toString)
+	props.bodiesDirectory(bodiesDir.toString)
+	props.binariesDirectory(binariesDir.toString)
 
 	Gatling.fromMap(props.build)
 }

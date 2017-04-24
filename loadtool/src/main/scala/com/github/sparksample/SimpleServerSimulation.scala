@@ -5,6 +5,8 @@ import io.gatling.core.protocol.Protocol
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef.http
 
+import scala.concurrent.duration._
+
 class SimpleServerSimulation extends Simulation {
   object Queries {
     val retentionForAllPeriod = exec(http("events/retention").get("/api/events/retention"))
@@ -20,6 +22,6 @@ class SimpleServerSimulation extends Simulation {
   val scn: ScenarioBuilder = scenario("Retention Analysis").exec(Queries.retentionForAllPeriod)
 
   setUp(
-    scn.inject(atOnceUsers(1))
+    scn.inject(rampUsers(120) over (60 seconds))
   ).protocols(httpConf)
 }
