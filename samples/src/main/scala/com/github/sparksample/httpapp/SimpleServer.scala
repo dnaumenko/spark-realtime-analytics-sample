@@ -1,4 +1,4 @@
-package com.github.sparksample.http
+package com.github.sparksample.httpapp
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http

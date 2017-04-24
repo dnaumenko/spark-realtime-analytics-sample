@@ -1,7 +1,7 @@
 package com.github.sparksample
 
 import com.github.sparksample.config.SparkConfig
-import com.github.sparksample.http.SimpleServer
+import com.github.sparksample.httpapp.SimpleServer
 import org.apache.spark.sql.SparkSession
 
 object LaunchHttpApp extends SparkConfig {
