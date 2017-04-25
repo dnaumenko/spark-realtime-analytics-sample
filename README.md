@@ -74,7 +74,8 @@ from IDE. The code and usage is trivial. Check [Gatling](http://gatling.io/docs/
 
 ## Issues found during testing
  
-* Concurrent SQL requests fail from time to time (should be fixed in 2.2.0) - https://issues.apache.org/jira/browse/SPARK-13747  
+* Concurrent SQL requests fail from time to time (should be fixed in 2.2.0) - 
+https://issues.apache.org/jira/browse/SPARK-13747 (tried to downgrade to Spark 1.6.3 in separate branch w/o luck). Switching to thread-pool executor helps.   
 
 # Resources
 
