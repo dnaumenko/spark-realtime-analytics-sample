@@ -50,13 +50,13 @@ object ExamplesBuild extends Build {
 }
 
 object Versions {
-  val scala = "2.11.8"
-  val spark = "2.1.0"
+  val scala = "2.10.5"
+  val spark = "1.6.3"
   val akka = "10.0.5"
-  val akkaHttpDsl = "2.4.11"
-  val cassandraConnector = "2.0.1"
+  val akkaHttpDsl = "2.0.5"
+  val cassandraConnector = "1.6.6"
 
-  val gatling = "2.2.5"
+  val gatling = "2.0.3"
 }
 
 object Dependencies {
@@ -65,15 +65,15 @@ object Dependencies {
   import Test._
 
   object Compile {
-    val sparkCore = "org.apache.spark" % "spark-core_2.11" % spark
-    val sparkSql = "org.apache.spark" % "spark-sql_2.11" % spark
-    val sparkHive = "org.apache.spark" % "spark-hive_2.11" % spark
-    val sparkHiveThriftServer = "org.apache.spark" % "spark-hive-thriftserver_2.11" % spark
-    val sparkCassandra = "com.datastax.spark" % "spark-cassandra-connector_2.11" % cassandraConnector
+    val sparkCore = "org.apache.spark" % "spark-core_2.10" % spark % "provided"
+    val sparkSql = "org.apache.spark" % "spark-sql_2.10" % spark % "provided"
+    val sparkHive = "org.apache.spark" % "spark-hive_2.10" % spark % "provided"
+    val sparkHiveThriftServer = "org.apache.spark" % "spark-hive-thriftserver_2.10" % spark % "provided"
+    val sparkCassandra = "com.datastax.spark" % "spark-cassandra-connector_2.10" % cassandraConnector
 
-    val akkaCore = "com.typesafe.akka" % "akka-http-core_2.11" % akka
-    val akkaHttp = "com.typesafe.akka" % "akka-http-experimental_2.11" % akkaHttpDsl
-    val akkaHttpSpray = "com.typesafe.akka" % "akka-http-spray-json_2.11" % akka
+    val akkaCore = "com.typesafe.akka" % "akka-actor_2.10" % "2.3.16"
+    val akkaHttp = "com.typesafe.akka" % "akka-http-experimental_2.10" % akkaHttpDsl
+    val akkaHttpSpray = "io.spray" % "spray-json_2.10" % "1.3.3"
   }
 
   object Test {

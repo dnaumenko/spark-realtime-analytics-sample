@@ -3,25 +3,25 @@ package com.github.sparksample.httpapp
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.{Directives, Route}
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+//import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import spray.json._
 
 import scala.concurrent.Future
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DataTypes
 
 final case class Identity(id: Long)
 
-trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
-  implicit val identityFormat: RootJsonFormat[Identity] = jsonFormat1(Identity)
-}
+//trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
+//  implicit val identityFormat: RootJsonFormat[Identity] = jsonFormat1(Identity)
+//}
 
-object SimpleServer extends Directives with JsonSupport {
+object SimpleServer extends Directives  {
 
-  def routes(ssc: SparkSession): Route = {
+  def routes(ssc: SQLContext): Route = {
     pathPrefix("api") {
       path("events" / "count") {
         get {
@@ -36,7 +36,7 @@ object SimpleServer extends Directives with JsonSupport {
         val events = ssc.read
           .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test", "table" -> "events"))
           .load()
-          .where("event_id == 4")
+//          .where("event_id == 4")
 
         val devices = ssc.read
           .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test", "table" -> "devices"))
@@ -66,10 +66,15 @@ object SimpleServer extends Directives with JsonSupport {
     }
   }
 
-  def run(ssc: SparkSession): Unit = {
+  def run(ssc: SQLContext): Unit = {
       implicit val system = ActorSystem()
       implicit val materializer = ActorMaterializer()
       import system.dispatcher
+
+      import java.util.concurrent.Executors
+      import concurrent.ExecutionContext
+      val executorService = Executors.newFixedThreadPool(4)
+      implicit val ec = ExecutionContext.fromExecutorService(executorService)
 
       val serverSource: Source[Http.IncomingConnection, Future[Http.ServerBinding]] =
         Http().bind(interface = "localhost", port = 9099)

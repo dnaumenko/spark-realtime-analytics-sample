@@ -1,7 +1,6 @@
 package com.github.sparksample
 
 import io.gatling.core.Predef._
-import io.gatling.core.protocol.Protocol
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef.http
 
@@ -12,7 +11,7 @@ class SimpleServerSimulation extends Simulation {
     val retentionForAllPeriod = exec(http("events/retention").get("/api/events/retention"))
   }
 
-  val httpConf: Protocol = http
+  val httpConf = http
     .baseURL("http://localhost:9099")
     .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8") // Here are the common headers
     .acceptEncodingHeader("gzip, deflate")
@@ -22,6 +21,6 @@ class SimpleServerSimulation extends Simulation {
   val scn: ScenarioBuilder = scenario("Retention Analysis").exec(Queries.retentionForAllPeriod)
 
   setUp(
-    scn.inject(rampUsers(120) over (60 seconds))
+    scn.inject(rampUsers(240) over (120 seconds))
   ).protocols(httpConf)
 }
