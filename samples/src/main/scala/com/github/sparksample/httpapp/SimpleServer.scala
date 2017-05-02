@@ -26,7 +26,7 @@ object SimpleServer extends Directives with JsonSupport {
       path("events" / "count") {
         get {
           val df = ssc.read
-            .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test", "table" -> "events"))
+            .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test_dump", "table" -> "events"))
             .load()
           val count = df.count()
 
@@ -34,13 +34,21 @@ object SimpleServer extends Directives with JsonSupport {
         }
       } ~ path("events" / "retention") {
         val events = ssc.read
-          .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test", "table" -> "events"))
+          .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test_dump", "table" -> "events"))
           .load()
           .where("event_id == 4")
 
+        events.cache()
+
+        println("Number of events partitions: " + events.rdd.getNumPartitions)
+
         val devices = ssc.read
-          .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test", "table" -> "devices"))
+          .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test_dump", "table" -> "devices"))
           .load()
+
+        devices.cache()
+
+        println("Number of devices partitions: " + devices.rdd.getNumPartitions)
 
         val join = events
           .join(devices, Seq("device_id"), "left")
@@ -51,8 +59,10 @@ object SimpleServer extends Directives with JsonSupport {
           .withColumn("d15_retention", when(col("event_date") === date_add(col("install_date"), 15), 1).otherwise(0))
           .withColumn("d30_retention", when(col("event_date") === date_add(col("install_date"), 30), 1).otherwise(0))
 
+        println("Number of join partitions: " + join.rdd.getNumPartitions)
+
         val j = join.select("*")
-          .groupBy("platform_name", "language", "device_model", "ip_country", "app_version", "os_version", "install_date")
+          .groupBy("language", "device_model", "ip_country", "app_version", "os_version", "install_date")
           .agg(
             count("id").alias("loggin_count")
             , sum("d1_retention").alias("d1_retention")

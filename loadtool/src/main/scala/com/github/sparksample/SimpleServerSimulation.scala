@@ -22,6 +22,6 @@ class SimpleServerSimulation extends Simulation {
   val scn: ScenarioBuilder = scenario("Retention Analysis").exec(Queries.retentionForAllPeriod)
 
   setUp(
-    scn.inject(rampUsers(120) over (60 seconds))
+    scn.inject(rampUsers(60) over (30 seconds))
   ).protocols(httpConf)
 }

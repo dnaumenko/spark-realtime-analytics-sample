@@ -6,7 +6,7 @@ import org.apache.spark.sql.SparkSession
 
 object LaunchHttpApp extends SparkConfig {
   def main(args: Array[String]): Unit = {
-    val conf = sparkConf(this.getClass.getName, standaloneMode = true)
+    val conf = sparkConf(this.getClass.getName, standaloneMode = false)
     val ssc = SparkSession.builder().config(conf).getOrCreate()
 
     SimpleServer.run(ssc)
