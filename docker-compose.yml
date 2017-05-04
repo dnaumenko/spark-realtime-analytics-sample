@@ -23,14 +23,14 @@ master:
     - ./conf/master:/conf
     - ./data:/tmp/data
 
-worker:
+worker_1:
   image: gettyimages/spark
   command: bin/spark-class org.apache.spark.deploy.worker.Worker -m 2048M spark://master:7077
-  hostname: worker
+  hostname: worker_1
   environment:
     SPARK_CONF_DIR: /conf
-    SPARK_WORKER_CORES: 2
-    SPARK_WORKER_MEMORY: 1g
+    SPARK_WORKER_CORES: 10
+    SPARK_WORKER_MEMORY: 2g
     SPARK_WORKER_PORT: 8881
     SPARK_WORKER_WEBUI_PORT: 8081
     SPARK_PUBLIC_DNS: localhost
@@ -45,6 +45,32 @@ worker:
     - 8881
   ports:
     - 8081:8081
+  volumes:
+    - ./conf/worker:/conf
+    - ./data:/tmp/data
+
+worker_2:
+  image: gettyimages/spark
+  command: bin/spark-class org.apache.spark.deploy.worker.Worker -m 2048M spark://master:7077
+  hostname: worker_2
+  environment:
+    SPARK_CONF_DIR: /conf
+    SPARK_WORKER_CORES: 10
+    SPARK_WORKER_MEMORY: 2g
+    SPARK_WORKER_PORT: 8882
+    SPARK_WORKER_WEBUI_PORT: 8082
+    SPARK_PUBLIC_DNS: localhost
+  links:
+    - master
+  expose:
+    - 7012
+    - 7013
+    - 7014
+    - 7015
+    - 7016
+    - 8881
+  ports:
+    - 8082:8082
   volumes:
     - ./conf/worker:/conf
     - ./data:/tmp/data
