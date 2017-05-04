@@ -1,15 +1,18 @@
 package com.github.sparksample.httpapp
 
+import java.util.concurrent.{Callable, TimeUnit}
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
+import com.google.common.cache.{Cache, CacheBuilder}
 import spray.json._
 
 import scala.concurrent.Future
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DataTypes
 
@@ -20,6 +23,9 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 }
 
 object SimpleServer extends Directives with JsonSupport {
+
+  private val cache: Cache[String, Dataset[Row]] = CacheBuilder.newBuilder()
+    .expireAfterWrite(1, TimeUnit.MINUTES).build[String, Dataset[Row]]()
 
   def routes(ssc: SparkSession): Route = {
     pathPrefix("api") {
@@ -33,21 +39,27 @@ object SimpleServer extends Directives with JsonSupport {
           complete(s"Identities count: $count")
         }
       } ~ path("events" / "retention") {
-        val events = ssc.read
-          .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test_dump", "table" -> "events"))
-          .load()
-          .where("event_id == 4")
+        val events = cache.get("events", new Callable[Dataset[Row]] {
+          override def call(): Dataset[Row] =  {
+            val result = ssc.read
+              .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test_dump", "table" -> "events"))
+              .load()
+              .where("event_id == 4")
 
-        events.cache()
-
+            result.cache() // mark cached in Spark internals to allow re-use
+          }
+        })
         println("Number of events partitions: " + events.rdd.getNumPartitions)
 
-        val devices = ssc.read
-          .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test_dump", "table" -> "devices"))
-          .load()
+        val devices = cache.get("devices", new Callable[Dataset[Row]] {
+          override def call(): Dataset[Row] =  {
+            val result = ssc.read
+              .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test_dump", "table" -> "devices"))
+              .load()
 
-        devices.cache()
-
+            result.cache() // mark cached in Spark internals to allow re-use
+          }
+        })
         println("Number of devices partitions: " + devices.rdd.getNumPartitions)
 
         val join = events

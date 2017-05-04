@@ -74,6 +74,8 @@ object Dependencies {
     val akkaCore = "com.typesafe.akka" % "akka-http-core_2.11" % akka
     val akkaHttp = "com.typesafe.akka" % "akka-http-experimental_2.11" % akkaHttpDsl
     val akkaHttpSpray = "com.typesafe.akka" % "akka-http-spray-json_2.11" % akka
+
+    val guava = "com.google.guava" % "guava" % "21.0"
   }
 
   object Test {
@@ -84,5 +86,5 @@ object Dependencies {
   val sparkAll = Seq(sparkCore, sparkSql, sparkHive, sparkHiveThriftServer, sparkCassandra)
   val gatlingAll = Seq(gatlingCharts)
 
-  val core: Seq[sbt.ModuleID] = sparkAll ++ akkaAll
+  val core: Seq[sbt.ModuleID] = Seq(guava) ++ sparkAll ++ akkaAll
 }
