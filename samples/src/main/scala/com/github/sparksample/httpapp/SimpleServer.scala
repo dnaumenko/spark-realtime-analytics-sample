@@ -84,6 +84,53 @@ object SimpleServer extends Directives with JsonSupport {
 
         j.show()
         complete("Check logs")
+      } ~ path("events" / "totals" / "60days") {
+        val events = cache.get("events_totals_60_days", new Callable[Dataset[Row]] {
+          override def call(): Dataset[Row] =  {
+            val result = ssc.read
+              .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test_dump", "table" -> "events"))
+              .load()
+              .where("event_at > date_sub(current_timestamp(), 61) and event_id in (4, 5, 9, 16)")
+
+            result.cache() // mark cached in Spark internals to allow re-use
+          }
+        })
+        println("Number of events partitions: " + events.rdd.getNumPartitions)
+
+        val devices = cache.get("devices", new Callable[Dataset[Row]] {
+          override def call(): Dataset[Row] =  {
+            val result = ssc.read
+              .format("org.apache.spark.sql.cassandra").options(Map("keyspace" -> "spark_test_dump", "table" -> "devices"))
+              .load()
+
+            result.cache() // mark cached in Spark internals to allow re-use
+          }
+        })
+        println("Number of devices partitions: " + devices.rdd.getNumPartitions)
+
+        val join = events
+          .join(devices, Seq("device_id"), "left")
+          .withColumn("install_date", col("received_at").cast(DataTypes.DateType))
+          .withColumn("event_date", col("event_at").cast(DataTypes.DateType))
+          .withColumn("games_played", when(col("event_id") === 5, 1).otherwise(0))
+          .withColumn("sessions_played", when(col("event_id") === 4, 1).otherwise(0))
+          .withColumn("gross_revenue", when((col("event_id") === 9).and(col("attr_3").isNotNull), 1).otherwise(0))
+          .withColumn("requests_sent_attr_1", when((col("event_id") === 16).and(col("attr_1").isNotNull), 1).otherwise(0))
+          .withColumn("requests_sent_attr_2", when((col("event_id") === 16).and(col("attr_2").isNotNull), 1).otherwise(0))
+
+        println("Number of join partitions: " + join.rdd.getNumPartitions)
+
+        val j = join.select("*")
+          .groupBy("install_date")
+          .agg(
+            sum("games_played").alias("games_played")
+            , sum("sessions_played").alias("sessions_played")
+            , sum("gross_revenue").alias("gross_revenue")
+            , sum("requests_sent_attr_1").alias("requests_sent")
+            , sum("requests_sent_attr_2").alias("requests_sent"))
+
+        j.show()
+        complete("Check logs")
       }
     }
   }

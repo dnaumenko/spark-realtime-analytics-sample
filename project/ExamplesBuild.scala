@@ -65,10 +65,10 @@ object Dependencies {
   import Test._
 
   object Compile {
-    val sparkCore = "org.apache.spark" % "spark-core_2.11" % spark % "provided"
-    val sparkSql = "org.apache.spark" % "spark-sql_2.11" % spark % "provided"
-    val sparkHive = "org.apache.spark" % "spark-hive_2.11" % spark % "provided"
-    val sparkHiveThriftServer = "org.apache.spark" % "spark-hive-thriftserver_2.11" % spark % "provided"
+    val sparkCore = "org.apache.spark" % "spark-core_2.11" % spark
+    val sparkSql = "org.apache.spark" % "spark-sql_2.11" % spark
+    val sparkHive = "org.apache.spark" % "spark-hive_2.11" % spark
+    val sparkHiveThriftServer = "org.apache.spark" % "spark-hive-thriftserver_2.11" % spark
     val sparkCassandra = "com.datastax.spark" % "spark-cassandra-connector_2.11" % cassandraConnector
 
     val akkaCore = "com.typesafe.akka" % "akka-http-core_2.11" % akka
