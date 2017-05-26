@@ -55,6 +55,9 @@ object Versions {
   val akka = "10.0.5"
   val akkaHttpDsl = "2.4.11"
   val cassandraConnector = "2.0.1"
+  val kafkaIntegration = "2.1.1"
+
+  val redshiftVersion = "1.11.133"
 
   val gatling = "2.2.5"
 }
@@ -69,11 +72,18 @@ object Dependencies {
     val sparkSql = "org.apache.spark" % "spark-sql_2.11" % spark
     val sparkHive = "org.apache.spark" % "spark-hive_2.11" % spark
     val sparkHiveThriftServer = "org.apache.spark" % "spark-hive-thriftserver_2.11" % spark
+    val sparkStreaming = "org.apache.spark" % "spark-streaming_2.11" % spark
+    val sparkStreamingKafka = "org.apache.spark" % "spark-streaming-kafka-0-10_2.11" % kafkaIntegration
+
     val sparkCassandra = "com.datastax.spark" % "spark-cassandra-connector_2.11" % cassandraConnector
 
     val akkaCore = "com.typesafe.akka" % "akka-http-core_2.11" % akka
     val akkaHttp = "com.typesafe.akka" % "akka-http-experimental_2.11" % akkaHttpDsl
     val akkaHttpSpray = "com.typesafe.akka" % "akka-http-spray-json_2.11" % akka
+
+    val redshift = "com.amazonaws" % "aws-java-sdk" % redshiftVersion
+    val redshiftJdbc = "com.amazon.redshift" % "jdbc4" % "1.2.1.1001" from "https://s3.amazonaws.com/redshift-downloads/drivers/RedshiftJDBC42-1.2.1.1001.jar"
+    val scalalikeJdbc = "org.scalikejdbc" % "scalikejdbc_2.11" % "3.0.0"
 
     val guava = "com.google.guava" % "guava" % "21.0"
   }
@@ -83,8 +93,10 @@ object Dependencies {
   }
 
   val akkaAll = Seq(akkaCore, akkaHttp, akkaHttpSpray)
-  val sparkAll = Seq(sparkCore, sparkSql, sparkHive, sparkHiveThriftServer, sparkCassandra)
+  val sparkAll = Seq(sparkCore, sparkSql, sparkHive, sparkHiveThriftServer, sparkCassandra,
+    sparkStreaming, sparkStreamingKafka)
   val gatlingAll = Seq(gatlingCharts)
+  val amazonAll = Seq(redshift, redshiftJdbc, scalalikeJdbc)
 
-  val core: Seq[sbt.ModuleID] = Seq(guava) ++ sparkAll ++ akkaAll
+  val core: Seq[sbt.ModuleID] = Seq(guava) ++ sparkAll ++ akkaAll ++ amazonAll
 }
