@@ -25,7 +25,8 @@ object ExamplesBuild extends Build {
   lazy val samples = Project(
     id = "samples",
     base = file("./samples"),
-    settings = Seq(libraryDependencies ++= Dependencies.core)
+    settings = Seq(libraryDependencies ++= Dependencies.core,
+      dependencyOverrides += ("com.databricks" % "spark-avro_2.11" % "3.2.0"))
   ).settings(
     assemblyMergeStrategy in assembly := {
       entry =>
@@ -82,7 +83,8 @@ object Dependencies {
     val akkaHttpSpray = "com.typesafe.akka" % "akka-http-spray-json_2.11" % akka
 
     val redshift = "com.amazonaws" % "aws-java-sdk" % redshiftVersion
-    val redshiftJdbc = "com.amazon.redshift" % "jdbc4" % "1.2.1.1001" from "https://s3.amazonaws.com/redshift-downloads/drivers/RedshiftJDBC42-1.2.1.1001.jar"
+    val redshiftJdbc = "com.amazon.redshift" % "jdbc4" % "1.2.1.1001" from "https://s3.amazonaws.com/redshift-downloads/drivers/RedshiftJDBCRedshiftJDBC4-1.2.1.1001.jar"
+    val sparkRedshift = "com.databricks" % "spark-redshift_2.11" % "2.0.1"
     val scalalikeJdbc = "org.scalikejdbc" % "scalikejdbc_2.11" % "3.0.0"
 
     val guava = "com.google.guava" % "guava" % "21.0"
@@ -94,7 +96,7 @@ object Dependencies {
 
   val akkaAll = Seq(akkaCore, akkaHttp, akkaHttpSpray)
   val sparkAll = Seq(sparkCore, sparkSql, sparkHive, sparkHiveThriftServer, sparkCassandra,
-    sparkStreaming, sparkStreamingKafka)
+    sparkStreaming, sparkStreamingKafka, sparkRedshift)
   val gatlingAll = Seq(gatlingCharts)
   val amazonAll = Seq(redshift, redshiftJdbc, scalalikeJdbc)
 
