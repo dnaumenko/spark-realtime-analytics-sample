@@ -75,7 +75,14 @@ from IDE. The code and usage is trivial. Check [Gatling](http://gatling.io/docs/
 ## Issues found during testing
  
 * Concurrent SQL requests fail from time to time (should be fixed in 2.2.0) - 
-https://issues.apache.org/jira/browse/SPARK-13747 (tried to downgrade to Spark 1.6.3 in separate branch w/o luck). Switching to thread-pool executor helps.   
+https://issues.apache.org/jira/browse/SPARK-13747 (tried to downgrade to Spark 1.6.3 in separate branch w/o luck). Switching to thread-pool executor helps.
+   
+* Spark-submit has a lot of common libs already provided in SPARK_HOME/lib. Unfortunately, it uses
+  the old Guice 3.0 and relies on Slf4j over Log4J (i.e. if your app depends on Logback, you are in trouble).
+  Can be fixed if you provide --driver-class-path=<path_to_assembly_jar>.
+  
+* Deduplication issues on jar assembly - specify ```case PathList("org", "apache", "spark", xs@_*) => MergeStrategy.last```
+in assembly strategy.
 
 # Resources
 
@@ -85,6 +92,10 @@ https://issues.apache.org/jira/browse/SPARK-13747 (tried to downgrade to Spark 1
 ## Cassandra-connector
 
 * https://github.com/datastax/spark-cassandra-connector/blob/master/doc/1_connecting.md
+
+## Redshift-connector
+
+* https://github.com/databricks/spark-redshift
 
 ## Thrift JDBC/ODBC Server
 
