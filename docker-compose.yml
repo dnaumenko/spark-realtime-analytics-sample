@@ -1,5 +1,5 @@
 master:
-  image: gettyimages/spark
+  image: dnaumenko/spark
   command: bin/spark-class org.apache.spark.deploy.master.Master -h master
   hostname: master
   environment:
@@ -24,7 +24,7 @@ master:
     - ./data:/tmp/data
 
 worker_1:
-  image: gettyimages/spark
+  image: dnaumenko/spark
   command: bin/spark-class org.apache.spark.deploy.worker.Worker -m 2048M spark://master:7077
   hostname: worker_1
   environment:
